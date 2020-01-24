@@ -16,31 +16,14 @@
         </div>
         <div class="bd-c-content">
           <ul class="bd-c-latest__list">
-            <li class="bd-c-latest__items">
+            <li
+              v-for="(item, index) in dataFromAPI"
+              :key="index"
+              class="bd-c-latest__items"
+            >
               <img
-                src="https://images.unsplash.com/photo-1523810632669-22fb8c6008f0?ixlib=rb-1.2.1&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb&amp;w=400&amp;fit=max&amp;ixid=eyJhcHBfaWQiOjExMjIwNn0"
-                alt="woman sitting on the rock with waterfall in distance during daytime"
-                class="bd-c-latest__image"
-              >
-            </li>
-            <li class="bd-c-latest__items">
-              <img
-                src="https://images.unsplash.com/photo-1546556402-1a63e35b57d9?ixlib=rb-1.2.1&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb&amp;w=400&amp;fit=max&amp;ixid=eyJhcHBfaWQiOjExMjIwNn0"
-                alt="clear glass mug with black beverage"
-                class="bd-c-latest__image"
-              >
-            </li>
-            <li class="bd-c-latest__items">
-              <img
-                src="https://images.unsplash.com/photo-1523810632669-22fb8c6008f0?ixlib=rb-1.2.1&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb&amp;w=400&amp;fit=max&amp;ixid=eyJhcHBfaWQiOjExMjIwNn0"
-                alt="woman sitting on the rock with waterfall in distance during daytime"
-                class="bd-c-latest__image"
-              >
-            </li>
-            <li class="bd-c-latest__items">
-              <img
-                src="https://images.unsplash.com/photo-1546556402-1a63e35b57d9?ixlib=rb-1.2.1&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb&amp;w=400&amp;fit=max&amp;ixid=eyJhcHBfaWQiOjExMjIwNn0"
-                alt="clear glass mug with black beverage"
+                :src="item.urls.small"
+                :alt="item.alt_description"
                 class="bd-c-latest__image"
               >
             </li>
@@ -50,6 +33,31 @@
     </div>
   </div>
 </template>
+
+<script>
+// import vuex untuk menggunakan store
+import { mapState } from 'vuex'
+
+export default {
+  computed: {
+    ...mapState({
+      // mengambil data dari state yang ada di store [state.nama_file_store.nama_state]
+      dataFromAPI: state => state.unsplash.latest
+    })
+  },
+  mounted () {
+    // memanggil fungsi getLatest setelah DOM ter-load
+    this.getLatest()
+  },
+  methods: {
+    async getLatest () {
+      // memamnggil action yang berada di store
+      // await this.$store.dispatch('nama_file_store/nama_action')
+      await this.$store.dispatch('unsplash/getDataLatest')
+    }
+  }
+}
+</script>
 
 <style scoped>
 /*
@@ -113,6 +121,7 @@
 
 .bd-c-latest__items img {
   border-radius: 8px;
+  max-width: 100%;
 }
 
 .bd-c-latest__list::after {
