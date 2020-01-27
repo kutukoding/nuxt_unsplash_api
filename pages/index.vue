@@ -21,11 +21,21 @@
               :key="index"
               class="bd-c-latest__items"
             >
-              <img
-                :src="item.urls.small"
-                :alt="item.alt_description"
-                class="bd-c-latest__image"
-              >
+              <div class="bd-c-latest__image">
+                <img
+                  :src="item.urls.small"
+                  :alt="item.alt_description"
+                  class="bd-c-latest__image"
+                >
+              </div>
+              <div class="bd-c-latest__content">
+                <div class="bd-c-latest__action">
+                  <a :href="`${item.links.download}?force=true`" class="bd-c-button bd-c-button--download">
+                    Download
+                  </a>
+                  <button :class="`bd-c-likes js-likes ${(item.liked_by_user) ? 'bd-c-likes--user' : ''}`" @click="likeActions(index)" />
+                </div>
+              </div>
             </li>
           </ul>
         </div>
@@ -37,8 +47,14 @@
 <script>
 // import vuex untuk menggunakan store
 import { mapState } from 'vuex'
+import lottie from 'lottie-web'
 
 export default {
+  data () {
+    return {
+      lottieArray: []
+    }
+  },
   computed: {
     ...mapState({
       // mengambil data dari state yang ada di store [state.nama_file_store.nama_state]
@@ -46,6 +62,23 @@ export default {
     })
   },
   mounted () {
+    const like = document.querySelectorAll('.js-likes')
+    const array = this.lottieArray
+
+    console.log(like)
+
+    like.forEach(function (value, index) {
+      const animateLottie = lottie.loadAnimation({
+        container: value, // the dom element that will contain the animation
+        renderer: 'svg',
+        loop: false,
+        autoplay: false,
+        path: '/lottie/love-2.json' // the path to the animation json
+      })
+      animateLottie.setDirection(-1)
+      array.push(animateLottie)
+    })
+
     // memanggil fungsi getLatest setelah DOM ter-load
     this.getLatest()
   },
@@ -54,6 +87,19 @@ export default {
       // memamnggil action yang berada di store
       // await this.$store.dispatch('nama_file_store/nama_action')
       await this.$store.dispatch('unsplash/getDataLatest')
+    },
+    likeActions (index) {
+      const element = document.querySelectorAll('.js-likes')
+      const status = element[index].classList.contains('bd-c-likes--user')
+      if (status) {
+        this.lottieArray[index].setDirection(-1)
+        this.lottieArray[index].play()
+        element[index].classList.remove('bd-c-likes--user')
+      } else {
+        this.lottieArray[index].setDirection(1)
+        this.lottieArray[index].play()
+        element[index].classList.add('bd-c-likes--user')
+      }
     }
   }
 }
@@ -137,6 +183,25 @@ export default {
 .bd-c-latest__items a {
   display: block;
   max-width: 100%;
+}
+
+.bd-c-button--download {
+  display: inline-block !important;
+  padding: 10px 15px;
+  border-radius: 8px;
+  background-color: #49484e;
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.bd-c-likes {
+  width: 46px;
+}
+
+.bd-c-latest__action {
+  display: flex;
+  align-items: center;
 }
 
 </style>
